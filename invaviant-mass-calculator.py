@@ -1,65 +1,96 @@
 import numpy as np
+import pandas as pd
 import uproot
 import pandas
 
-def inv_m(file, p1, p2, flavor1 = 0, flavor2 = 0, df = False, graph = True):
+def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, df = False, graph = True):
     file = uproot.open(file)
     tree = file["Delphes"]
-    flavor = tree["Jet/Jet.Flavor"].array(library = "np")
     
-    if p1 == "muon":
-        pt1 = tree["Muon/Muon.PT"].array(library = "np")
-        eta1 = tree["Muon/Muon.Eta"].array(library = "np")
-        phi1 = tree["Muon/Muon.Phi"].array(library = "np")
-        charge1 = tree["Muon/Muon.Charge"].array(library = "np")
-        c1 = True
-        
-    elif p1 == "electron":
-        pt1 = tree["Electron/Electron.PT"].array(library = "np")
-        eta1 = tree["Electron/Electron.Eta"].array(library = "np")
-        phi1 = tree["Electron/Electron.Phi"].array(library = "np")
-        charge1 = tree["Electron/Electron.Charge"].array(library = "np")
-        c1 = True
-        
-    elif p1 == "photon":
-        pt1 = tree["Photon/Photon.PT"].array(library = "np")
-        eta1 = tree["Photon/Photon.Eta"].array(library = "np")
-        phi1 = tree["Photon/Photon.Phi"].array(library = "np")
-        c1 = False
-        
-    elif flavor1 != 0:
-        pt1 = tree["Jet/Jet.PT"].array(library = "np")
-        eta1 = tree["Jet/Jet.Eta"].array(library = "np")
-        phi1 = tree["Jet/Jet.Phi"].array(library = "np")
-        charge1 = tree["Jet/Jet.Charge"].array(library = "np")
-        c1 = True
+    if flavor1 != 0 or flavor2 != 0:
+        flavor = tree["Jet/Jet.Flavor"].array(library = "np")
     
-    if p2 == "muon":
-        pt2 = tree["Muon/Muon.PT"].array(library = "np")
-        eta2 = tree["Muon/Muon.Eta"].array(library = "np")
-        phi2 = tree["Muon/Muon.Phi"].array(library = "np")
-        charge2 = tree["Muon/Muon.Charge"].array(library = "np")
-        c2 = True
+    if p1 != p2:
+        if p1 == "muon":
+            pt1 = tree["Muon/Muon.PT"].array(library = "np")
+            eta1 = tree["Muon/Muon.Eta"].array(library = "np")
+            phi1 = tree["Muon/Muon.Phi"].array(library = "np")
+            charge1 = tree["Muon/Muon.Charge"].array(library = "np")
+            c1 = True
+            
+        elif p1 == "electron":
+            pt1 = tree["Electron/Electron.PT"].array(library = "np")
+            eta1 = tree["Electron/Electron.Eta"].array(library = "np")
+            phi1 = tree["Electron/Electron.Phi"].array(library = "np")
+            charge1 = tree["Electron/Electron.Charge"].array(library = "np")
+            c1 = True
+            
+        elif p1 == "photon":
+            pt1 = tree["Photon/Photon.PT"].array(library = "np")
+            eta1 = tree["Photon/Photon.Eta"].array(library = "np")
+            phi1 = tree["Photon/Photon.Phi"].array(library = "np")
+            c1 = False
+            
+        elif flavor1 != 0:
+            pt1 = tree["Jet/Jet.PT"].array(library = "np")
+            eta1 = tree["Jet/Jet.Eta"].array(library = "np")
+            phi1 = tree["Jet/Jet.Phi"].array(library = "np")
+            charge1 = tree["Jet/Jet.Charge"].array(library = "np")
+            c1 = True
         
-    elif p2 == "electron":
-        pt2 = tree["Electron/Electron.PT"].array(library = "np")
-        eta2 = tree["Electron/Electron.Eta"].array(library = "np")
-        phi2 = tree["Electron/Electron.Phi"].array(library = "np")
-        charge2 = tree["Electron/Electron.Charge"].array(library = "np")
-        c2 = True
-        
-    elif p2 == "photon":
-        pt2 = tree["Photon/Photon.PT"].array(library = "np")
-        eta2 = tree["Photon/Photon.Eta"].array(library = "np")
-        phi2 = tree["Photon/Photon.Phi"].array(library = "np")
-        c2 = False
-        
-    elif flavor2 != 0:
-        pt2 = tree["Jet/Jet.PT"].array(library = "np")
-        eta2 = tree["Jet/Jet.Eta"].array(library = "np")
-        phi2 = tree["Jet/Jet.Phi"].array(library = "np")
-        charge2 = tree["Jet/Jet.Charge"].array(library = "np")
-        c2 = True
+        if p2 == "muon":
+            pt2 = tree["Muon/Muon.PT"].array(library = "np")
+            eta2 = tree["Muon/Muon.Eta"].array(library = "np")
+            phi2 = tree["Muon/Muon.Phi"].array(library = "np")
+            charge2 = tree["Muon/Muon.Charge"].array(library = "np")
+            c2 = True
+            
+        elif p2 == "electron":
+            pt2 = tree["Electron/Electron.PT"].array(library = "np")
+            eta2 = tree["Electron/Electron.Eta"].array(library = "np")
+            phi2 = tree["Electron/Electron.Phi"].array(library = "np")
+            charge2 = tree["Electron/Electron.Charge"].array(library = "np")
+            c2 = True
+            
+        elif p2 == "photon":
+            pt2 = tree["Photon/Photon.PT"].array(library = "np")
+            eta2 = tree["Photon/Photon.Eta"].array(library = "np")
+            phi2 = tree["Photon/Photon.Phi"].array(library = "np")
+            c2 = False
+            
+        elif flavor2 != 0:
+            pt2 = tree["Jet/Jet.PT"].array(library = "np")
+            eta2 = tree["Jet/Jet.Eta"].array(library = "np")
+            phi2 = tree["Jet/Jet.Phi"].array(library = "np")
+            charge2 = tree["Jet/Jet.Charge"].array(library = "np")
+            c2 = True
+    else:
+        if p1 == "muon":
+            pt1 = tree["Muon/Muon.PT"].array(library = "np")
+            eta1 = tree["Muon/Muon.Eta"].array(library = "np")
+            phi1 = tree["Muon/Muon.Phi"].array(library = "np")
+            charge1 = tree["Muon/Muon.Charge"].array(library = "np")
+            c1 = True
+            
+        elif p1 == "electron":
+            pt1 = tree["Electron/Electron.PT"].array(library = "np")
+            eta1 = tree["Electron/Electron.Eta"].array(library = "np")
+            phi1 = tree["Electron/Electron.Phi"].array(library = "np")
+            charge1 = tree["Electron/Electron.Charge"].array(library = "np")
+            c1 = True
+            
+        elif p1 == "photon":
+            pt1 = tree["Photon/Photon.PT"].array(library = "np")
+            eta1 = tree["Photon/Photon.Eta"].array(library = "np")
+            phi1 = tree["Photon/Photon.Phi"].array(library = "np")
+            c1 = False
+            
+        elif flavor1 != 0:
+            pt1 = tree["Jet/Jet.PT"].array(library = "np")
+            eta1 = tree["Jet/Jet.Eta"].array(library = "np")
+            phi1 = tree["Jet/Jet.Phi"].array(library = "np")
+            charge1 = tree["Jet/Jet.Charge"].array(library = "np")
+            c1 = True
         
     # The jet flavor is computed using the the Simple Δ𝑅
     # highest-flavor match and it is asigned as follows:
@@ -70,7 +101,9 @@ def inv_m(file, p1, p2, flavor1 = 0, flavor2 = 0, df = False, graph = True):
     #   c --> 4
     #   b --> 5
     
-    if (c1 == True and c2 == True) and (flavor1 == 0 and flavor2 == 0):
+    # For different particles that aren't photons:
+    if p1 != p2 and (c1 == True and c2 == True):
+        
         events = len(pt1)
         
         pt_1 = []
@@ -86,6 +119,121 @@ def inv_m(file, p1, p2, flavor1 = 0, flavor2 = 0, df = False, graph = True):
         event_1 = []
         event_2 = []
         
+        if flavor1 == 0 and flavor2 == 0:
+            
+            for i in range(events):
+                if len(pt1[i]) > 0 and len(pt2[i]) > 0: # At least one of each
+                    index1 = np.argmax(pt1[i])
+                    index2 = np.argmax(pt2[i])
+                    
+                    if charge1[i,index1] + charge2[i,index2] == charge:
+                        
+                        pt_1.append(pt1[i,index1])
+                        eta_1.append(eta1[i,index1])
+                        phi_1.append(phi1[i,index1])
+                        cha_1.append(charge1[i,index1])
+                            
+                        pt_2.append(pt2[i,index2])
+                        eta_2.append(eta2[i,index2])
+                        phi_2.append(phi2[i,index2])
+                        cha_2.append(charge2[i,index2])
+                            
+                        event_1.append(i)
+                        event_2.append(i)
+            
+        # For collisions with both decay particles being jets
+        elif flavor1 != 0 and flavor2 !=0:
+            
+            pts_flavor_1 = []
+            etas_flavor_1 = []
+            phis_flavor_1 = []
+            chas_flavor_1 = []
+            event_1 = []
+            
+            pts_flavor_2 = []
+            etas_flavor_2 = []
+            phis_flavor_2 = []
+            chas_flavor_2 = []
+            event_2 = []
+            
+            for i in range(events):
+                event_len = len(flavor[i])
+                for k in range(event_len):
+                    if flavor[i,k] == flavor1:
+                        pts_flavor_1.append(pt1[i,k])
+                        etas_flavor_1.append(eta1[i,k])
+                        phis_flavor_1.append(phi1[i,k])
+                        chas_flavor_1.append(charge1[i,k])
+                        
+                    elif flavor[i,k] == flavor2:
+                        pts_flavor_2.append(pt2[i,k])
+                        etas_flavor_2.append(eta2[i,k])
+                        phis_flavor_2.append(phi2[i,k])
+                        chas_flavor_2.append(charge2[i,k])
+                
+                
+                if len(pts_flavor_1[i]) > 0 and len(pts_flavor_2[i]) > 0: # At least one of each
+                    index1 = np.argmax(pts_flavor_1[i])
+                    index2 = np.argmax(pts_flavor_2[i])
+                    
+                    if chas_flavor_1[i,index1] + chas_flavor_2[i,index2] == charge:
+                        
+                        pt_1.append(pts_flavor_1[i,index1])
+                        eta_1.append(etas_flavor_1[i,index1])
+                        phi_1.append(phis_flavor_1[i,index1])
+                        cha_1.append(chas_flavor_1[i,index1])
+                            
+                        pt_2.append(pts_flavor_2[i,index2])
+                        eta_2.append(etas_flavor_2[i,index2])
+                        phi_2.append(phis_flavor_2[i,index2])
+                        cha_2.append(chas_flavor_2[i,index2])
+                            
+                        event_1.append(i)
+                        event_2.append(i)
+             
+        pt_1 = np.array(pt_1)
+        eta_1 = np.array(eta_1)
+        phi_1 = np.array(phi_1)
+        cha_1 = np.array(cha_1)
+            
+        pt_2 = np.array(pt_2)
+        eta_2 = np.array(eta_2)
+        phi_2 = np.array(phi_2)
+        cha_2 = np.array(cha_2)
+             
+        event_1 = np.array(event_1)
+        event_2 = np.array(event_2)
+        
+        if df == True:
+            data = {
+                    "pt_1": pt_1,
+                    "pt_2": pt_2,
+                    "eta_1": eta_1,
+                    "eta_2": eta_2,
+                    "phi_1": phi_1,
+                    "phi_2": phi_2,
+                    "charge_1": cha_1,
+                    "charge_2": cha_2
+                    }
+                
+            data = pd.DataFrame(data)
+            
+    # For different particles with one kind of them are photons
+    elif (c1 == False or c2 == False):
+        
+        events = len(pt1)
+        
+        pt_1 = []
+        eta_1 = []
+        phi_1 = []
+        
+        pt_2 = []
+        eta_2 = []
+        phi_2 = []
+        
+        event_1 = []
+        event_2 = []
+        
         if p1 != p2:
             for i in range(events):
                 if len(pt1) > 0 and len(pt2) > 0: 
@@ -95,12 +243,36 @@ def inv_m(file, p1, p2, flavor1 = 0, flavor2 = 0, df = False, graph = True):
                     pt_1.append(pt1[i,index1])
                     eta_1.append(eta1[i,index1])
                     phi_1.append(phi1[i,index1])
-                    cha_1.append(charge1[i,index1])
                     
                     pt_2.append(pt2[i,index2])
                     eta_2.append(eta2[i,index2])
                     phi_2.append(phi2[i,index2])
-                    cha_2.append(charge2[i,index2])
+                    
+                    event_1.append(i)
+                    event_2.append(i)
+         
+        pt_1 = np.array(pt_1)
+        eta_1 = np.array(eta_1)
+        phi_1 = np.array(phi_1)
+        
+        pt_2 = np.array(pt_2)
+        eta_2 = np.array(eta_2)
+        phi_2 = np.array(phi_2)
+         
+        event_1 = np.array(event_1)
+        event_2 = np.array(event_2)
+        
+        if df == True:
+            data = {
+                    "pt_1": pt_1,
+                    "pt_2": pt_2,
+                    "eta_1": eta_1,
+                    "eta_2": eta_2,
+                    "phi_1": phi_1,
+                    "phi_2": phi_2
+                    }
+                
+            data = pd.DataFrame(data)
                     
         
         

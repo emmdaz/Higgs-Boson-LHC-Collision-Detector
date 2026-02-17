@@ -1,8 +1,10 @@
 import numpy as np
 import pandas as pd
 import uproot
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, df = False, graph = True):
+def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, save_df = False, graph = True):
     file = uproot.open(file)
     tree = file["Delphes"]
     
@@ -240,19 +242,18 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, df = False, graph 
         event_1 = np.array(event_1)
         event_2 = np.array(event_2)
         
-        if df == True:
-            data = {
-                    "pt_1": pt_1,
-                    "pt_2": pt_2,
-                    "eta_1": eta_1,
-                    "eta_2": eta_2,
-                    "phi_1": phi_1,
-                    "phi_2": phi_2,
-                    "charge_1": cha_1,
-                    "charge_2": cha_2
+        data = {
+                "pt_1": pt_1,
+                "pt_2": pt_2,
+                "eta_1": eta_1,
+                "eta_2": eta_2,
+                "phi_1": phi_1,
+                "phi_2": phi_2,
+                "charge_1": cha_1,
+                "charge_2": cha_2
                     }
                 
-            data = pd.DataFrame(data)
+        data = pd.DataFrame(data) 
             
     # For different particles with one kind of them are photons
     elif p1 != p2 and (c1 == False or c2 == False):
@@ -370,18 +371,17 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, df = False, graph 
 
         charge_12 = np.array(charge_12)
         
-        if df == True:
-            data = {
-                    "pt_1": pt_1,
-                    "pt_2": pt_2,
-                    "eta_1": eta_1,
-                    "eta_2": eta_2,
-                    "phi_1": phi_1,
-                    "phi_2": phi_2,
-                    "charge12": charge_12
+        data = {
+                "pt_1": pt_1,
+                "pt_2": pt_2,
+                "eta_1": eta_1,
+                "eta_2": eta_2,
+                "phi_1": phi_1,
+                "phi_2": phi_2,
+                "charge_12": cha_12,
                     }
                 
-            data = pd.DataFrame(data)
+        data = pd.DataFrame(data) 
 
     # In the case of detections of particles from the same type.
     # Events with no photons:
@@ -473,19 +473,18 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, df = False, graph 
         event_1 = np.array(event_1)
         event_2 = np.array(event_2)
         
-        if df == True:
-            data = {
-                    "pt_1": pt_1,
-                    "pt_2": pt_2,
-                    "eta_1": eta_1,
-                    "eta_2": eta_2,
-                    "phi_1": phi_1,
-                    "phi_2": phi_2,
-                    "charge_1": cha_1,
-                    "charge_2": cha_2
+        data = {
+                "pt_1": pt_1,
+                "pt_2": pt_2,
+                "eta_1": eta_1,
+                "eta_2": eta_2,
+                "phi_1": phi_1,
+                "phi_2": phi_2,
+                "charge_1": cha_1,
+                "charge_2": cha_2
                     }
                 
-            data = pd.DataFrame(data) 
+        data = pd.DataFrame(data) 
 
     elif p1 == p2 and (c1 == False):
         events = len(pt1)
@@ -541,27 +540,43 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, df = False, graph 
         event_1 = np.array(event_1)
         event_2 = np.array(event_2)
         
-        if df == True:
-            data = {
-                    "pt_1": pt_1,
-                    "pt_2": pt_2,
-                    "eta_1": eta_1,
-                    "eta_2": eta_2,
-                    "phi_1": phi_1,
-                    "phi_2": phi_2,
-                    "charge_12": cha_12,
+        data = {
+                "pt_1": pt_1,
+                "pt_2": pt_2,
+                "eta_1": eta_1,
+                "eta_2": eta_2,
+                "phi_1": phi_1,
+                "phi_2": phi_2,
+                "charge_12": cha_12,
                     }
                 
-            data = pd.DataFrame(data) 
+        data = pd.DataFrame(data) 
 
+    # Compute the momentum components
+    data["p1_x"] = data["pt_1"]*np.cos(data["phi_1"])
+    data["p1_y"] = data["pt_1"]*np.sin(data["phi_1"])
+    data["p1_z"] = data["pt_1"]*np.sinh(data["eta_1"])
 
+    data["p2_x"] = data["pt_2"]*np.cos(data["phi_2"])
+    data["p2_y"] = data["pt_2"]*np.sin(data["phi_2"])
+    data["p2_z"] = data["pt_2"]*np.sinh(data["eta_2"])
 
+    # Then we can calculate the invariant mass
 
-                    
-        
-        
-                
-           
-        
+    data["inv_m"] = np.sqrt((np.sqrt(data["p1_x"]**2 + data["p1_y"]**2 + data["p1_z"]**2) + 
+                                np.sqrt(data["p2_x"]**2 + data["p2_y"]**2 + data["p2_z"]**2))**2 - 
+                                (data["p1_x"] + data["p2_x"])**2 - (data["p1_y"] + data["p2_y"])**2 -
+                                (data["p1_z"] + data["p2_z"])**2 )
+
+    # To save the dataframe as a .csv file:
+    if save_df == True:
+        data.to_csv("Invariant-Mass.csv")
     
-    
+    if graph == True:
+        sns.histplot(data["inv_m"], bins = 1000, kde = False)
+        plt.xlabel(r"$m_{inv}$ (GeV)")
+        plt.ylabel("Number of events")
+        plt.title(r"Event Invariant mass")
+        plt.legend()
+        plt.grid(True, alpha = 0.3)
+        plt.show()

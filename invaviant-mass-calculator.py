@@ -367,6 +367,8 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, df = False, graph 
          
         event_1 = np.array(event_1)
         event_2 = np.array(event_2)
+
+        charge_12 = np.array(charge_12)
         
         if df == True:
             data = {
@@ -375,7 +377,8 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, df = False, graph 
                     "eta_1": eta_1,
                     "eta_2": eta_2,
                     "phi_1": phi_1,
-                    "phi_2": phi_2
+                    "phi_2": phi_2,
+                    "charge12": charge_12
                     }
                 
             data = pd.DataFrame(data)

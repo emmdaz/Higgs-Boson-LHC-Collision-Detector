@@ -145,19 +145,6 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, save_df = False, g
             
         # For collisions with decayment particles being jets
         elif flavor1 != 0 or flavor2 !=0:
-            
-            pt_1 = []
-            eta_1 = []
-            phi_1 = []
-            cha_1 = []
-            
-            pt_2 = []
-            eta_2 = []
-            phi_2 = []
-            cha_2 = []
-            
-            event_1 = []
-            event_2 = []
 
             # For both particles being jets:
             if flavor1 != 0 and flavor2 != 0:
@@ -423,9 +410,9 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, save_df = False, g
                         cha_1.append(charge1[i][index1])
                             
                         pt_2.append(trial_pt2)
-                        eta_2.append(eta2[i][index2])
-                        phi_2.append(phi2[i][index2])
-                        cha_2.append(charge2[i][index2])
+                        eta_2.append(eta1[i][index2])
+                        phi_2.append(phi1[i][index2])
+                        cha_2.append(charge1[i][index2])
                             
                         event_1.append(i)
                         event_2.append(i)
@@ -453,9 +440,9 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, save_df = False, g
                             cha_1.append(charge1[i][index1])
                                 
                             pt_2.append(trial_pt2)
-                            eta_2.append(eta2[i][index2])
-                            phi_2.append(phi2[i][index2])
-                            cha_2.append(charge2[i][index2])
+                            eta_2.append(eta1[i][index2])
+                            phi_2.append(phi1[i][index2])
+                            cha_2.append(charge1[i][index2])
                                 
                             event_1.append(i)
                             event_2.append(i)

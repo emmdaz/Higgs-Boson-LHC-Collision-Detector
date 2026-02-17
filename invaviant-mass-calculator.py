@@ -141,122 +141,88 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, df = False, graph 
                         event_1.append(i)
                         event_2.append(i)
             
-        # For collisions with both decay particles being jets
+        # For collisions with decayment particles being jets
         elif flavor1 != 0 or flavor2 !=0:
             
-            pts_flavor_1 = []
-            etas_flavor_1 = []
-            phis_flavor_1 = []
-            chas_flavor_1 = []
-            event_1 = []
+            pt_1 = []
+            eta_1 = []
+            phi_1 = []
+            cha_1 = []
             
-            pts_flavor_2 = []
-            etas_flavor_2 = []
-            phis_flavor_2 = []
-            chas_flavor_2 = []
+            pt_2 = []
+            eta_2 = []
+            phi_2 = []
+            cha_2 = []
+            
+            event_1 = []
             event_2 = []
 
+            # For both particles being jets:
             if flavor1 != 0 and flavor2 != 0:
                 for i in range(events):
-                    event_len = len(flavor[i])
-                    for k in range(event_len):
-                        if flavor[i,k] == flavor1:
-                            pts_flavor_1.append(pt1[i,k])
-                            etas_flavor_1.append(eta1[i,k])
-                            phis_flavor_1.append(phi1[i,k])
-                            chas_flavor_1.append(charge1[i,k])
-                            
-                        elif flavor[i,k] == flavor2:
-                            pts_flavor_2.append(pt2[i,k])
-                            etas_flavor_2.append(eta2[i,k])
-                            phis_flavor_2.append(phi2[i,k])
-                            chas_flavor_2.append(charge2[i,k])
+                    suma_1 = np.sum(flavor[i] == flavor1)
+                    suma_2 = np.sum(flavor[i] == flavor2)
 
-                        elif flavor[i,k] != flavor1 and flavor[i,k] != flavor2:
-                            pts_flavor_1.append([])
-                            etas_flavor_1.append([])
-                            phis_flavor_1.append([])
-                            chas_flavor_1.append([])
+                    if suma_1 > 0 and suma_2 > 0:
+                        index1 = np.argmax(pt1[i])
+                        index2 = np.argmax(pt2[i])
 
-                            pts_flavor_2.append([])
-                            etas_flavor_2.append([])
-                            phis_flavor_2.append([])
-                            chas_flavor_2.append([])
-                    
-                    if len(pts_flavor_1[i]) > 0 and len(pts_flavor_2[i]) > 0: # At least one of each
-                        index1 = np.argmax(pts_flavor_1[i])
-                        index2 = np.argmax(pts_flavor_2[i])
-                        
-                        if chas_flavor_1[i,index1] + chas_flavor_2[i,index2] == charge:
-                            
-                            pt_1.append(pts_flavor_1[i,index1])
-                            eta_1.append(etas_flavor_1[i,index1])
-                            phi_1.append(phis_flavor_1[i,index1])
-                            cha_1.append(chas_flavor_1[i,index1])
+                        if charge1[i,index1] + charge2[i,index2] == charge:
+                            pt_1.append(pt1[i,index1])
+                            eta_1.append(eta1[i,index1])
+                            phi_1.append(phi1[i,index1])
+                            cha_1.append(charge1[i,index1])
                                 
-                            pt_2.append(pts_flavor_2[i,index2])
-                            eta_2.append(etas_flavor_2[i,index2])
-                            phi_2.append(phis_flavor_2[i,index2])
-                            cha_2.append(chas_flavor_2[i,index2])
+                            pt_2.append(pt2[i,index2])
+                            eta_2.append(eta2[i,index2])
+                            phi_2.append(phi2[i,index2])
+                            cha_2.append(charge2[i,index2])
+                                
+                            event_1.append(i)
+                            event_2.append(i)             
+
+            # For just the first particle being a jet:
+            elif flavor1 != 0 and flavor2 == 0:
+                for i in range(events):
+                    suma_1 = np.sum(flavor[i] == flavor1)
+
+                    if suma_1 > 0 and len(pt2[i]) > 0:
+                        index1 = np.argmax(pt1[i])
+                        index2 = np.argmax(pt2[i])
+
+                        if charge1[i,index1] + charge2[i,index2] == charge:
+                            pt_1.append(pt1[i,index1])
+                            eta_1.append(eta1[i,index1])
+                            phi_1.append(phi1[i,index1])
+                            cha_1.append(charge1[i,index1])
+                                
+                            pt_2.append(pt2[i,index2])
+                            eta_2.append(eta2[i,index2])
+                            phi_2.append(phi2[i,index2])
+                            cha_2.append(charge2[i,index2])
                                 
                             event_1.append(i)
                             event_2.append(i)
 
-            elif flavor1 != 0 and flavor2 == 0:
-            
-                pts_flavor_1 = []
-                etas_flavor_1 = []
-                phis_flavor_1 = []
-                chas_flavor_1 = []
-                event_1 = []
-                
-                pt_2 = []
-                eta_2 = []
-                phi_2 = []
-                cha_2 = []
-                event_2 = []
-                
+            # For just the 2nd particle being a jet: 
+            elif flavor1 == 0 and flavor2 != 0:
                 for i in range(events):
-                    event_len = len(flavor[i])
-                    for k in range(event_len):
-                        if flavor[i,k] == flavor1:
-                            pts_flavor_1.append(pt1[i,k])
-                            etas_flavor_1.append(eta1[i,k])
-                            phis_flavor_1.append(phi1[i,k])
-                            chas_flavor_1.append(charge1[i,k])
-                            
-                        elif flavor[i,k] == flavor2:
-                            pts_flavor_2.append(pt2[i,k])
-                            etas_flavor_2.append(eta2[i,k])
-                            phis_flavor_2.append(phi2[i,k])
-                            chas_flavor_2.append(charge2[i,k])
+                    suma_2 = np.sum(flavor[i] == flavor2)
 
-                        elif flavor[i,k] != flavor1 and flavor[i,k] != flavor2:
-                            pts_flavor_1.append([])
-                            etas_flavor_1.append([])
-                            phis_flavor_1.append([])
-                            chas_flavor_1.append([])
+                    if suma_2 > 0 and len(pt1[i]) > 0:
+                        index1 = np.argmax(pt1[i])
+                        index2 = np.argmax(pt2[i])
 
-                            pts_flavor_2.append([])
-                            etas_flavor_2.append([])
-                            phis_flavor_2.append([])
-                            chas_flavor_2.append([])
-                    
-                    if len(pts_flavor_1[i]) > 0 and len(pts_flavor_2[i]) > 0: # At least one of each
-                        index1 = np.argmax(pts_flavor_1[i])
-                        index2 = np.argmax(pts_flavor_2[i])
-                        
-                        if chas_flavor_1[i,index1] + chas_flavor_2[i,index2] == charge:
-                            
-                            pt_1.append(pts_flavor_1[i,index1])
-                            eta_1.append(etas_flavor_1[i,index1])
-                            phi_1.append(phis_flavor_1[i,index1])
-                            cha_1.append(chas_flavor_1[i,index1])
+                        if charge1[i,index1] + charge2[i,index2] == charge:
+                            pt_1.append(pt1[i,index1])
+                            eta_1.append(eta1[i,index1])
+                            phi_1.append(phi1[i,index1])
+                            cha_1.append(charge1[i,index1])
                                 
-                            pt_2.append(pts_flavor_2[i,index2])
-                            eta_2.append(etas_flavor_2[i,index2])
-                            phi_2.append(phis_flavor_2[i,index2])
-                            cha_2.append(chas_flavor_2[i,index2])
+                            pt_2.append(pt2[i,index2])
+                            eta_2.append(eta2[i,index2])
+                            phi_2.append(phi2[i,index2])
+                            cha_2.append(charge2[i,index2])
                                 
                             event_1.append(i)
                             event_2.append(i)

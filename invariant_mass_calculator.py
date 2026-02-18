@@ -4,7 +4,7 @@ import uproot
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, save_df = False, graph = True):
+def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, save_df = False, graph = True, mass = 0):
     file = uproot.open(file)
     tree = file["Delphes"]
     
@@ -146,15 +146,32 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, save_df = False, g
         # For collisions with decayment particles being jets
         elif flavor1 != 0 or flavor2 !=0:
 
-            # For both particles being jets:
+            # For both particles being jets with different flavor:
             if flavor1 != 0 and flavor2 != 0:
                 for i in range(events):
                     suma_1 = np.sum(flavor[i] == flavor1)
                     suma_2 = np.sum(flavor[i] == flavor2)
+                    positions1 = []
+                    positions2 = []
+                    trials_pt1 = []
+                    trials_pt2 = []
 
                     if suma_1 > 0 and suma_2 > 0:
-                        index1 = np.argmax(pt1[i])
-                        index2 = np.argmax(pt2[i])
+
+                        for k in range(len(flavor[i])):
+                            if flavor[i][k] == flavor1:
+                                positions1.append(k)
+                                trials_pt1.append(pt1[i][k]) 
+                                
+                            elif flavor[i][k] == flavor2:
+                                positions2.append(k)
+                                trials_pt2.append(pt2[i][k])
+
+                        pt_max1 = trials_pt1.index(max(trials_pt1))
+                        pt_max2 = trials_pt2.index(max(trials_pt2))
+
+                        index1 = positions1[pt_max1]
+                        index2 = positions2[pt_max2]
 
                         if charge1[i][index1] + charge2[i][index2] == charge:
                             pt_1.append(pt1[i][index1])
@@ -260,12 +277,12 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, save_df = False, g
 
         charge_12 = []
 
-        # When none of them are jets so ones are photons and the others
-        # are some other kind
+        # When none of them are jets so one kind are photons and the others
+        # are some other particle
         if flavor1 == 0 and flavor2 == 0:
         
             for i in range(events):
-                if len(pt1) > 0 and len(pt2) > 0:
+                if len(pt1[i]) > 0 and len(pt2[i]) > 0:
 
                     index1 = np.argmax(pt1[i])
                     index2 = np.argmax(pt2[i])
@@ -284,7 +301,7 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, save_df = False, g
                         event_1.append(i)
                         event_2.append(i)
 
-                    elif charge2[i][index2] == charge:
+                    elif c2 == True and charge2[i][index2] == charge:
                         charge_12.append(charge2[i][index2])
 
                         pt_1.append(pt1[i][index1])
@@ -365,7 +382,7 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, save_df = False, g
                 "eta_2": eta_2,
                 "phi_1": phi_1,
                 "phi_2": phi_2,
-                "charge_12": cha_12,
+                "charge_12": charge_12,
                     }
                 
         data = pd.DataFrame(data) 
@@ -473,6 +490,7 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, save_df = False, g
                 
         data = pd.DataFrame(data) 
 
+    # For photons
     elif p1 == p2 and (c1 == False):
         events = len(pt1)
         
@@ -498,21 +516,19 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, save_df = False, g
 
                 index2 = np.argmax(pt1[i])
                 trial_pt2 = pt1[i][index2]
-
-                if charge1[i][index1] + charge1[i][index2] == charge:
                         
-                    pt_1.append(trial_pt1)
-                    eta_1.append(eta1[i][index1])
-                    phi_1.append(phi1[i][index1])
+                pt_1.append(trial_pt1)
+                eta_1.append(eta1[i][index1])
+                phi_1.append(phi1[i][index1])
                             
-                    pt_2.append(trial_pt2)
-                    eta_2.append(eta2[i][index2])
-                    phi_2.append(phi2[i][index2])
+                pt_2.append(trial_pt2)
+                eta_2.append(eta1[i][index2])
+                phi_2.append(phi1[i][index2])
 
-                    cha_12.append(0)
+                cha_12.append(0)
                             
-                    event_1.append(i)
-                    event_2.append(i)
+                event_1.append(i)
+                event_2.append(i)
 
         pt_1 = np.array(pt_1)
         eta_1 = np.array(eta_1)
@@ -559,8 +575,17 @@ def inv_m(file, p1, p2, charge = 0, flavor1 = 0, flavor2 = 0, save_df = False, g
     if save_df == True:
         data.to_csv("Invariant-Mass.csv")
     
-    if graph == True:
+    if graph == True and mass == 0:
         sns.histplot(data["inv_m"], bins = 1000, kde = False)
+        plt.xlabel(r"$m_{inv}$ (GeV)")
+        plt.ylabel("Number of events")
+        plt.title(r"Event Invariant mass")
+        plt.grid(True, alpha = 0.3)
+        plt.show()
+
+    elif graph == True and mass != 0:
+        sns.histplot(data["inv_m"], bins = 1000, kde = False)
+        plt.axvline(x = mass, color = "red", linestyle = ':', label = rf"$m_{{inv}}$ = {mass}")
         plt.xlabel(r"$m_{inv}$ (GeV)")
         plt.ylabel("Number of events")
         plt.title(r"Event Invariant mass")
